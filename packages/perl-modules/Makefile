@@ -7,6 +7,18 @@ DEPENDS  = freetds
 
 SYBASE   = $(shell readlink -m ../freetds/tmpinstall$(OMD_ROOT))
 
+# When invoked by a parallel parent make (e.g. Makefile.parallel with -jN),
+# MAKEFLAGS contains --jobserver-auth, meaning the parent is already spreading
+# work across all CPUs.  Adding our own parallelism on top would oversubscribe
+# the machine, so we fall back to serial in that case.
+# Standalone builds (no parent -j) use all cores.
+# The caller can always override explicitly: make JOBS=4
+ifneq (,$(findstring --jobserver,$(MAKEFLAGS)))
+  JOBS ?= 1
+else
+  JOBS ?= $(shell nproc)
+endif
+
 PERL_VERSION = $(shell perl -e 'print $$]')
 HAS_PERL_5_40_OR_NEWER := $(shell \
     required_version="5.040000"; \
@@ -36,6 +48,10 @@ PREMODULES += \
 	      Cpanel-JSON-*.tar.gz
 
 MODULES = \
+          CryptX-0.087.tar.gz \
+          Encode-3.19.tar.gz \
+          Devel-CheckLib-1.13.tar.gz \
+          ExtUtils-PkgConfig-1.16.tar.gz \
           App-cpanminus-1.7048.tar.gz \
           AppConfig-1.71.tar.gz \
           Capture-Tiny-0.46.tar.gz \
@@ -84,7 +100,6 @@ MODULES = \
           File-Remove-1.57.tar.gz \
           File-Slurp-9999.27.tar.gz \
           File-Which-1.27.tar.gz \
-          ExtUtils-PkgConfig-1.16.tar.gz \
           GD-2.83.tar.gz \
           Getopt-Long-2.50.tar.gz \
           HTML-Tagset-3.20.tar.gz \
@@ -159,12 +174,10 @@ MODULES = \
           Bit-Vector-7.4.tar.gz \
           CPAN-Meta-2.150010.tar.gz \
           CPAN-Meta-YAML-0.018.tar.gz \
-          Devel-CheckLib-1.13.tar.gz \
           DBD-mysql-4.052.tar.gz \
           Date-Calc-6.4.tar.gz \
           Date-Calc-XS-6.4.tar.gz \
           Devel-GlobalDestruction-0.14.tar.gz \
-          Encode-3.19.tar.gz \
           File-Listing-6.04.tar.gz \
           HTML-Parser-3.72.tar.gz \
           Module-Metadata-1.000033.tar.gz \
@@ -238,11 +251,10 @@ MODULES = \
           namespace-autoclean-0.28.tar.gz \
           File-Tail-1.3.tar.gz \
           UUID-0.28.tar.gz \
-          CryptX-0.087.tar.gz \
           Crypt-JWT-0.036.tar.gz \
           Thruk-Utils-XS-0.03.tar.gz \
           Monitoring-TT-1.0.3.tar.gz \
-          Monitoring-GLPlugin-6.4.0.1.tar.gz
+          Monitoring-GLPlugin-6.5.tar.gz
 
 
 # newer perl can use system threads
@@ -278,7 +290,7 @@ build:
 	        FORCE=1 ./build_module.pl -d "$(DISTRO)" -p $(P5TMPDIST)/dest $(PREMODULES); \
 	    export PERL_JSON_BACKEND='Cpanel::JSON::XS'; \
 	    cd $(P5TMPDIST)/src && \
-	        ./build_module.pl -d "$(DISTRO)" -p $(P5TMPDIST)/dest $(MODULES)
+	        ./build_module.pl -j $(JOBS) -d "$(DISTRO)" -p $(P5TMPDIST)/dest $(MODULES)
 	cd $(P5TMPDIST)/dest/lib/perl5/ && rm -f utils.pm && ln -s ../../../monitoring-plugins/utils.pm .
 	rm -rf $(P5TMPDIST)/dest/lib/perl5/lib/perl5/*/auto/Encode/{CN,JP,KR,TW}
 	rm -rf $(P5TMPDIST)/dest/lib/perl5/lib/perl5/*/auto/share/dist/DBD-SQLite

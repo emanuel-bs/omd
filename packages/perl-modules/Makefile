@@ -24,7 +24,7 @@ LIBXML = Path-Tiny-0.150.tar.gz \
          Alien-Build-Plugin-Download-GitLab-0.01.tar.gz \
          Alien-Libxml2-0.20.tar.gz \
          XML-LibXML-2.0213.tar.gz
-CRYPTX = CryptX-0.090.tar.gz
+CRYPTX = CryptX-0.091.tar.gz
 ifeq ($(DISTRO_CODE),el7)
 CRYPTX = CryptX-0.087.tar.gz
 LIBXML = XML-LibXML-2.0134.tar.gz
@@ -255,7 +255,7 @@ MODULES = \
           File-Tail-1.3.tar.gz \
           UUID-0.28.tar.gz \
           $(CRYPTX) \
-          Crypt-JWT-0.036.tar.gz \
+          Crypt-JWT-0.038.tar.gz \
           Thruk-Utils-XS-0.03.tar.gz \
           Monitoring-TT-1.0.3.tar.gz \
           Monitoring-GLPlugin-6.5.0.3.tar.gz

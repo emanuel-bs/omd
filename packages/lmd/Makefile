@@ -14,7 +14,7 @@ PWD         = $(shell pwd)
 GITBASE     = github.com/sni
 GITURL      = $(GITBASE)/$(NAME)
 # GIT TAG is set automatically by "make upstream" or "make package"
-GIT_TAG     = v2.8.2
+GIT_TAG     = v2.9.0
 
 .PHONY: skel
 
@@ -91,7 +91,7 @@ package: clean
 			gzip -9 $(NAME)-$(VERSION).tar; \
 		fi
 		cp $(GOPATH)/src/$(GITURL)/lmd.ini.example skel/etc/thruk/lmd.ini ; \
-		patch -p1 < patches/lmd.ini.skel_patch ; \
+		patch -p1 < patches/lmd.ini.skel_patch || exit 1; \
 		rm -rf $(GOPATH)
 	rm -f skel/etc/thruk/lmd.ini.*
 

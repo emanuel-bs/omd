@@ -1,5 +1,5 @@
---- a/skel/etc/thruk/lmd.ini	2025-05-20 13:28:37.000000000 +0200
-+++ b/skel/etc/thruk/lmd.ini	2025-05-20 14:52:55.388765936 +0200
+--- a/skel/etc/thruk/lmd.ini	2026-09-11 15:36:00.680671480 +0200
++++ b/skel/etc/thruk/lmd.ini	2026-09-11 15:36:38.213325494 +0200
 @@ -1,7 +1,9 @@
 -# Listen for incoming livestatus requests here
 -# TCP or unix sockets are allowed. Multiple entries are also valid.
@@ -27,7 +27,7 @@
  
  # LogSlowQueryThreshold sets the maximum amount of seconds before logging a query as slow query
  LogSlowQueryThreshold = 5
-@@ -90,7 +92,10 @@
+@@ -94,7 +96,10 @@
  
  # Skip ssl certificate verification on https remote backends.
  # Set to 1 to disabled any ssl verification checks.
@@ -39,7 +39,7 @@
  
  # Use keepalive for backend peer connections.
  BackendKeepAlive = true
-@@ -123,52 +128,5 @@
+@@ -127,66 +132,5 @@
  # to go off. Set to zero to disable this check.
  MaxClockDelta = 10.0
  
@@ -52,19 +52,19 @@
 -# use tcp connections with multiple sources for clusters
 -[[Connections]]
 -name   = "Monitoring Site A"
--id     = "id1"
+-id     = "id2"
 -source = ["192.168.33.10:6557", "192.168.33.20:6557"]
 -
 -# or local unix sockets as remote sites
 -[[Connections]]
 -name   = "Local Site"
--id     = "id2"
+-id     = "id3"
 -source = ["/var/tmp/nagios/run/live.sock"]
 -
 -# use tcp connections with ipv6 address
 -[[Connections]]
 -name   = "Monitoring Site A IPv6"
--id     = "id3"
+-id     = "id4"
 -source = ["[::1]:6557"]
 -
 -# tcp connection to icinga2 with explicit flag set in case of autodetection fails
@@ -74,10 +74,24 @@
 -source = ["[::1]:6557"]
 -flags  = ["icinga2"]
 -
+-# icinga2 rest api backend, fetched through the /v1/objects/... and /v1/status endpoints.
+-# use the "icinga2-restv1" flag to activate the rest api translation layer.
+-# the source url is used as the api base (path defaults to /v1),
+-# credentials can be embedded in the source url or set with the auth option.
+-# requires status/query, objects/query/* and filter-expression API permissions.
+-# keep FullUpdateInterval enabled to refresh configuration attributes as well.
+-[[Connections]]
+-name              = "Icinga2 REST Backend"
+-id                = "icinga2-restv1"
+-source            = ["https://icinga2.monitoring/v1"]
+-auth              = "monitoring:<password>"
+-flags             = ["icinga2-restv1"]
+-tlsSkipVerify     = 0
+-
 -# connect to thruk http(s) api
 -[[Connections]]
 -name   = "Thruk HTTP"
--id     = "id4"
+-id     = "id5"
 -source = ["http://thruk.monitoring/omdsite/"]
 -auth   = "authkey..."
 -

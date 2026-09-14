@@ -5,7 +5,7 @@ PWD        = $(shell pwd)
 SHELL      = bash
 
 #for binary downloads
-VERSION    = 1.149.0
+VERSION    = 1.152.0
 VVERSION   = v$(VERSION)
 DIR        = VictoriaMetrics-$(VERSION)
 

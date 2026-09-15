@@ -6,6 +6,7 @@ PACKAGES += freetds
 PACKAGES += perl-modules
 PACKAGES += go-bootstrap
 PACKAGES += go-1.26
+PACKAGES += go-1.27
 PACKAGES += upx
 PACKAGES += node
 PACKAGES += node-modules
